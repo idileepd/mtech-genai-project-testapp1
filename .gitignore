@@ -1,2 +1,21 @@
+# Dependencies
 node_modules/
+
+# macOS
 .DS_Store
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs & test output
+*.log
+npm-debug.log*
+coverage/
+junit.xml
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
