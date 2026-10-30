@@ -1,13 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const searchService = require("../services/searchService");
+const escapeHtml = require("escape-html");
 
-// GET /search?q= — search the catalog.
+// Encode characters that basic HTML escaping leaves intact but that are used
+// to build XSS payloads (parens in JS calls, "=" in event handlers).
+function encodeExtra(value) {
+  return String(value).replace(/[()=]/g, (ch) => ({
+    "(": "&#40;",
+    ")": "&#41;",
+    "=": "&#61;",
+  }[ch]));
+}
+
+// GET /search?q= — search the catalog (output HTML-encoded).
 router.get("/", (req, res) => {
-  const q = req.query.q || ""; // CX-1002 [source] Request.Query
-  const results = searchService.search(q);
-  // CX-1002 [sink] Reflected_XSS (CWE-79): `q` reflected into HTML without encoding.
-  res.send(`<h2>Results for: ${q}</h2><ul>${results.map((r) => `<li>${r}</li>`).join("")}</ul>`);
+  const input = req.query.q || ""; // CX-1002 [source] Request.Query
+  const results = searchService.search(input);
+  // CX-1002 fix (CWE-79): HTML-encode all reflected user input before rendering.
+  const q = encodeExtra(escapeHtml(input));
+  res.send("<h2>Results for: " + q + "</h2><ul>" + results.map((r) => "<li>" + encodeExtra(escapeHtml(r)) + "</li>").join("") + "</ul>");
 });
 
 module.exports = router;
