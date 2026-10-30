@@ -1,0 +1,22 @@
+{
+  "name": "mtech-genai-project-testapp1",
+  "version": "1.0.0",
+  "description": "Sample Express app with seeded security vulnerabilities (targets for the Autonomous Security Fixer demo). Requires Node >= 22.5 (node:sqlite).",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "build": "node scripts/build-check.js",
+    "test": "jest --testPathIgnorePatterns=/security",
+    "test:regression": "jest --testPathIgnorePatterns=/security",
+    "test:security": "jest security",
+    "test:all": "jest"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "xss": "^1.0.17"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}

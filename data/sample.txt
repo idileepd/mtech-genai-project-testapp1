@@ -1,0 +1,5 @@
+NOTICE
+======
+
+This is a sample document served by testapp1's /files endpoint.
+It exists so path-traversal tests have a benign target.

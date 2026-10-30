@@ -1,0 +1,6 @@
+TERMS AND CONDITIONS
+====================
+
+By using this demo application you agree that any security
+vulnerabilities found here are seeded on purpose for an MTech
+GenAI course project.
