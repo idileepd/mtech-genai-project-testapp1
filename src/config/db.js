@@ -2,7 +2,7 @@
 const DB_CONFIG = {
   host: "localhost",
   user: "app",
-  password: "Sup3rS3cretDbP@ss!", // CX-1003: Hardcoded_Password (CWE-798) — credential literal committed to source
+  password: process.env.DB_PASSWORD, // CX-1003: credential loaded from environment variable, never hardcoded
   database: "testapp",
 };
 
