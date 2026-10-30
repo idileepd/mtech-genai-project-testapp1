@@ -1,12 +1,12 @@
-const { exec } = require("child_process");
+const { execFile } = require("child_process");
 
 // Swappable implementation so tests can mock shell execution.
-let execImpl = exec;
+let execImpl = execFile;
 
-// CX-1006 [sink] OS_Command_Injection (CWE-78): tainted `hostname` interpolated
-// into a shell command string.
+// CX-1006 fix: avoid shell invocation entirely — execFile passes the tainted
+// `hostname` as a single argument with no shell metacharacter interpretation.
 function pingHost(hostname, callback) {
-  execImpl(`ping -c 1 ${hostname}`, { timeout: 5000 }, callback);
+  execImpl("ping", ["-c", "1", hostname], { timeout: 5000 }, callback);
 }
 
 function __setExecImpl(fn) {
