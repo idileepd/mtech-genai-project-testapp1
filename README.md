@@ -4,7 +4,7 @@ Sample Express (Node.js) application with **10 seeded security vulnerabilities**
 (3 Critical + 7 High) matching the Checkmarx-style report in
 `../checkmarx-reports/testapp1-checkmarx-report.json`.
 
-This is the **target application** for the Autonomous Security Fixer (ASF):
+This is the **target application** for the Autonomous Security Remediation (ASF):
 the agent clones/uses this repo, fixes the High/Critical findings, runs the
 test suites, and opens a Pull Request (left **unmerged** — demo only).
 

@@ -1,7 +1,7 @@
 {
   "name": "mtech-genai-project-testapp1",
   "version": "1.0.0",
-  "description": "Sample Express app with seeded security vulnerabilities (targets for the Autonomous Security Fixer demo). Requires Node >= 22.5 (node:sqlite).",
+  "description": "Sample Express app with seeded security vulnerabilities (targets for the Autonomous Security Remediation demo). Requires Node >= 22.5 (node:sqlite).",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
