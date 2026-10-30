@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "testapp1 API",
+    "description": "Sample Express application with 10 seeded security vulnerabilities (CX-1001 .. CX-1010). Use Swagger UI to try every endpoint — GET and POST.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local dev server" }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "example": { "ok": true } } }
+          }
+        }
+      }
+    },
+    "/users/{username}": {
+      "get": {
+        "summary": "Look up a user profile",
+        "description": "CX-1001 sink: SQL injection via template literal in userService.findByUsername.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "alice"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "example": { "id": 1, "username": "alice", "email": "alice@example.com", "bio": "I love coffee and code." }
+              }
+            }
+          },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Search the catalog",
+        "description": "CX-1002 sink: reflected XSS — response is raw HTML with unescaped query.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "coffee"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTML result page",
+            "content": { "text/html": { "example": "<h2>Results for: coffee</h2><ul></ul>" } }
+          }
+        }
+      }
+    },
+    "/files": {
+      "get": {
+        "summary": "Serve a file from the data/ directory",
+        "description": "CX-1005 sink: path traversal — 'name' is joined into a filesystem path unsanitized.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "sample.txt"
+          }
+        ],
+        "responses": {
+          "200": { "description": "File contents" },
+          "400": { "description": "Missing name" },
+          "404": { "description": "File not found" }
+        }
+      }
+    },
+    "/reports": {
+      "get": {
+        "summary": "Orders since a date",
+        "description": "CX-1008 sink: SQL injection via string concatenation on 'from'. Example: ?from=2026-01-01' OR '1'='1",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "example": "2026-01-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order list",
+            "content": { "application/json": { "example": { "orders": [] } } }
+          },
+          "500": { "description": "Report failed" }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "summary": "Post-login redirect",
+        "description": "CX-1010 sink: open redirect — 'next' is used unvalidated. Try: ?next=https://example.com",
+        "parameters": [
+          {
+            "name": "next",
+            "in": "query",
+            "schema": { "type": "string" },
+            "example": "/dashboard"
+          }
+        ],
+        "responses": {
+          "302": { "description": "Redirect to next" }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Create an account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password", "email"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" },
+                  "email": { "type": "string", "format": "email" }
+                }
+              },
+              "example": { "username": "dave", "password": "pass123", "email": "dave@example.com" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "example": { "created": "dave" } } } },
+          "400": { "description": "Missing fields" },
+          "409": { "description": "Username already taken" }
+        }
+      }
+    },
+    "/profile": {
+      "post": {
+        "summary": "Update profile bio (sanitized preview)",
+        "description": "CX-1009 is a deliberate FALSE POSITIVE — input is sanitized with the xss package. Try: {\"bio\":\"<script>alert(1)</script>Hello\"} and note the echoed HTML is escaped.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "bio": { "type": "string" } }
+              },
+              "example": { "bio": "<script>alert(1)</script>Hello" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rendered preview",
+            "content": { "text/html": { "example": "<div class=\"bio\">&lt;script&gt;alert(1)&lt;/script&gt;Hello</div>" } }
+          }
+        }
+      }
+    },
+    "/admin/ping": {
+      "post": {
+        "summary": "Ping a host (network diagnostics)",
+        "description": "CX-1006 sink: command injection via exec. Try: {\"hostname\":\"localhost\"} or inject: {\"hostname\":\"localhost; whoami\"}",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["hostname"],
+                "properties": { "hostname": { "type": "string" } }
+              },
+              "example": { "hostname": "localhost" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Ping output", "content": { "application/json": { "example": { "output": "PING localhost..." } } } },
+          "500": { "description": "Ping failed" }
+        }
+      }
+    },
+    "/import": {
+      "post": {
+        "summary": "Import a base64 payload",
+        "description": "CX-1007 sink: unsafe deserialization via eval. Valid demo payload (base64 of a JSON object) — try: {\"blob\":\"eyJuYW1lIjoiV2lkZ2V0IiwiaXNBZG1pbiI6dHJ1ZX0=\"} which imports {name: Widget, isAdmin: true}.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["blob"],
+                "properties": { "blob": { "type": "string", "description": "base64-encoded serialized payload" } }
+              },
+              "example": { "blob": "eyJuYW1lIjoiV2lkZ2V0IiwiaXNBZG1pbiI6dHJ1ZX0=" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imported",
+            "content": { "application/json": { "example": { "imported": "test", "isAdmin": true } } }
+          },
+          "400": { "description": "Invalid import payload / missing blob" }
+        }
+      }
+    }
+  }
+}

@@ -13,10 +13,14 @@
   },
   "dependencies": {
     "express": "^4.21.2",
+    "swagger-ui-express": "^5.0.1",
     "xss": "^1.0.17"
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^7.0.0"
+  },
+  "overrides": {
+    "iconv-lite": "0.4.23"
   }
 }

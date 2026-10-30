@@ -1,4 +1,6 @@
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("../swagger.json");
 
 const users = require("./routes/users");
 const search = require("./routes/search");
@@ -15,6 +17,23 @@ function createApp() {
   app.use(express.json());
 
   app.get("/health", (req, res) => res.json({ ok: true }));
+
+  // Swagger UI — interactive API docs at /docs (raw spec at /docs/swagger.json)
+  app.use(
+    "/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+      customSiteTitle: "testapp1 API — Swagger UI",
+      customCss: ".swagger-ui .topbar { display: none }",
+    })
+  );
+  app.get("/", (req, res) => {
+    res.send(
+      `<h1>testapp1 API</h1>` +
+      `<p>Interactive API docs: <a href="/docs">/docs (Swagger UI)</a></p>` +
+      `<p>Health check: <a href="/health">/health</a></p>`
+    );
+  });
 
   app.use("/users", users);
   app.use("/search", search);
