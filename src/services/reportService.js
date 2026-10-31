@@ -1,9 +1,14 @@
 const db = require("../db");
 
-// CX-1008 [sink] SQL_Injection (CWE-89): tainted `from` concatenated into SQL.
+// CX-1008 fix: validate `from` as YYYY-MM-DD and use a parameterized query.
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 function getOrdersSince(from) {
-  const sql = "SELECT * FROM orders WHERE created_at >= '" + from + "'";
-  return db.query(sql);
+  if (typeof from !== "string" || !DATE_RE.test(from)) {
+    return [];
+  }
+  const sql = "SELECT * FROM orders WHERE created_at >= ?";
+  return db.query(sql, [from]);
 }
 
 module.exports = { getOrdersSince };
