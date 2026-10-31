@@ -1,7 +1,7 @@
 // Deserialization helper used by the import pipeline.
-// CX-1007 (CWE-502): this uses eval() — unsafe deserialization of untrusted data.
+// CX-1007 [FIX] (CWE-502): Migrated to a safe, native JSON parser to avoid code execution.
 function unserialize(str) {
-  return eval("(" + str + ")");
+  return JSON.parse(str);
 }
 
 module.exports = { unserialize };
