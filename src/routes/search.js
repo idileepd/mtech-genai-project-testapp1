@@ -4,10 +4,14 @@ const searchService = require("../services/searchService");
 
 // GET /search?q= — search the catalog.
 router.get("/", (req, res) => {
-  const q = req.query.q || ""; // CX-1002 [source] Request.Query
-  const results = searchService.search(q);
-  // CX-1002 [sink] Reflected_XSS (CWE-79): `q` reflected into HTML without encoding.
-  res.send(`<h2>Results for: ${q}</h2><ul>${results.map((r) => `<li>${r}</li>`).join("")}</ul>`);
+  // CX-1002 [source]: the raw query is untrusted. It is validated against a
+  // strict allowlist before it is used for searching, and it is never
+  // reflected into an HTML response body.
+  const { q } = req.query;
+  const term =
+    typeof q === "string" && /^[a-zA-Z0-9 _-]{0,100}$/.test(q) ? q : "";
+  const results = searchService.search(term);
+  res.json({ message: "Results for:", results });
 });
 
 module.exports = router;
